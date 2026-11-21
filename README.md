@@ -23,6 +23,22 @@ A API fica em `http://localhost:3000/api`, e o MySQL em `localhost:3308` (banco 
 | Parar e manter os dados | `docker compose down` |
 | Apagar os dados e recriar o banco | `docker compose down -v && docker compose up -d --build` |
 
+## Deploy no Railway
+
+O GitHub Actions valida cada PR e push. Na `main`, depois de passar, publica com `railway up`. O deploy fica desligado até a variável `RAILWAY_SERVICE` existir no repositório.
+
+1. No Railway, crie um projeto com um MySQL e um serviço vazio chamado `bps-api`. Não conecte o serviço ao GitHub, para não publicar duas vezes.
+2. Defina no serviço: `DB_HOST=${{MySQL.MYSQLHOST}}`, `DB_PORT=${{MySQL.MYSQLPORT}}`, `DB_USER=${{MySQL.MYSQLUSER}}`, `DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}`, `DB_NAME=bps`, `PORT=3000` e um `APP_SECRET` longo e aleatório.
+3. Configure o healthcheck do serviço como `/api/health`.
+4. Crie um token de projeto para o ambiente `production` e salve no GitHub: secret `RAILWAY_TOKEN` e variável `RAILWAY_SERVICE=bps-api`.
+5. Só no primeiro deploy, crie o banco e o admin pelo shell do serviço. **`criar-banco` apaga as tabelas existentes.**
+
+```bash
+railway ssh --service bps-api
+node dist/scripts/criar-banco.js
+node dist/scripts/criar-admin.js voce@exemplo.com suasenha123 "Seu Nome"
+```
+
 ## Como rodar sem Docker
 
 Pré-requisitos: Node 20.6+ e MySQL **8.0.16+**. As funções de janela, as CTEs e os CHECK aplicados de fato só existem a partir dessa versão; MariaDB e MySQL 5.7 não servem.
