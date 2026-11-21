@@ -1,9 +1,9 @@
 # BPS: Banco de Preços em Saúde
 
-CRUD e dashboards sobre as compras públicas de medicamentos do BPS. Feito em NestJS + MySQL 8, com SQL puro (`mysql2`, sem ORM).
+API de CRUD e dashboards sobre as compras públicas de medicamentos do BPS. Feita em NestJS + MySQL 8, com SQL puro (`mysql2`, sem ORM). A interface fica no projeto `bps-web` (Vite + React + shadcn/ui).
 
 - **Requisitos funcionais:** `docs/requisitos.md`
-- **Decisão de arquitetura:** `docs/ADR-001-arquitetura.md`
+- **Decisões de arquitetura:** `docs/ADR-001-arquitetura.md` e `docs/ADR-002-frontend-react.md`
 
 ## Como rodar
 
@@ -16,10 +16,18 @@ npm run build
 npm run db:criar                  # cria o banco "bps" e as tabelas (APAGA as existentes)
 npm run criar-admin -- voce@exemplo.com suasenha123 "Seu Nome"
 npm run importar -- caminho/2026.csv
-npm start                         # http://localhost:3000
+npm start                         # API em http://localhost:3000/api
 ```
 
-Também dá para criar o banco pelo cliente do MySQL: `mysql -u root -p < database/01_schema.sql`, depois `02_seed_estados.sql`. O CSV também pode ser importado pela tela **Importar CSV do BPS**.
+Com a API no ar, rode a interface em outro terminal:
+
+```bash
+cd ../bps-web
+npm install
+npm run dev                       # http://localhost:5173
+```
+
+Também dá para criar o banco pelo cliente do MySQL: `mysql -u root -p < database/01_schema.sql`, depois `02_seed_estados.sql`. O CSV também pode ser importado pela tela **Importar CSV** do `bps-web`.
 
 Para mostrar o SQL gerado pelo CRUD, use `LOG_SQL=1` no `.env`: toda query aparece no console.
 
@@ -34,7 +42,6 @@ src/
   importacao/        leitor de CSV em streaming + importador idempotente
   dashboard/         SQL dos 4 dashboards (CTEs, ROW_NUMBER, mediana)
   scripts/           criar-banco, criar-admin, importar
-public/              frontend: HTML + JS puro, Leaflet (mapa), Chart.js (gráficos)
 ```
 
 ## Perfis

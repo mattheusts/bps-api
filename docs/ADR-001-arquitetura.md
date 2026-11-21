@@ -1,6 +1,6 @@
 # ADR-001: Arquitetura da aplicação BPS (CRUD + dashboards)
 
-**Status:** Aceito
+**Status:** Aceito. A parte de frontend foi substituída pelo [ADR-002](ADR-002-frontend-react.md).
 **Data:** 2026-11-21
 **Decisores:** Matheus (e o professor, se ele exigir uma estrutura diferente)
 
