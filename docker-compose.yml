@@ -1,0 +1,55 @@
+# Ambiente de desenvolvimento. As credenciais abaixo não devem ser usadas em produção.
+name: bps-dev
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: bps_root_dev
+      MYSQL_DATABASE: bps
+      MYSQL_USER: bps
+      MYSQL_PASSWORD: bps_dev
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    ports:
+      - "127.0.0.1:${BPS_DB_PORT:-3308}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Roda em ordem alfabética, apenas quando o volume do banco está vazio.
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Usa TCP porque o servidor temporário da inicialização só aceita socket.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -ubps -pbps_dev --silent"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: bps
+      DB_PASSWORD: bps_dev
+      DB_NAME: bps
+      APP_SECRET: segredo-apenas-para-desenvolvimento-local
+      TOKEN_HORAS: 8
+      LOG_SQL: ${BPS_LOG_SQL:-0}
+    ports:
+      - "127.0.0.1:${BPS_API_PORT:-3000}:3000"
+    volumes:
+      - .:/app
+      - api_node_modules:/app/node_modules
+      - api_dist:/app/dist
+
+volumes:
+  db_data:
+  api_node_modules:
+  api_dist:

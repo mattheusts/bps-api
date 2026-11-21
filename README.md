@@ -5,7 +5,25 @@ API de CRUD e dashboards sobre as compras públicas de medicamentos do BPS. Feit
 - **Requisitos funcionais:** `docs/requisitos.md`
 - **Decisões de arquitetura:** `docs/ADR-001-arquitetura.md` e `docs/ADR-002-frontend-react.md`
 
-## Como rodar
+## Como rodar com Docker (desenvolvimento)
+
+Pré-requisito: Docker com Compose. O comando abaixo sobe a API e um MySQL 8 já com as tabelas e os 27 estados. Alterações em `src/` recompilam e reiniciam a API.
+
+```bash
+docker compose up -d --build
+docker compose exec api node dist/scripts/criar-admin.js voce@exemplo.com suasenha123 "Seu Nome"
+```
+
+A API fica em `http://localhost:3000/api`, e o MySQL em `localhost:3308` (banco `bps`, usuário `bps`, senha `bps_dev`). Para usar outras portas, defina `BPS_API_PORT` e `BPS_DB_PORT`. Para mostrar o SQL no log, use `BPS_LOG_SQL=1`.
+
+| Ação | Comando |
+|---|---|
+| Ver os logs | `docker compose logs -f api` |
+| Importar um CSV colocado em `uploads/` | `docker compose exec api node dist/scripts/importar.js uploads/2026.csv` |
+| Parar e manter os dados | `docker compose down` |
+| Apagar os dados e recriar o banco | `docker compose down -v && docker compose up -d --build` |
+
+## Como rodar sem Docker
 
 Pré-requisitos: Node 20.6+ e MySQL **8.0.16+**. As funções de janela, as CTEs e os CHECK aplicados de fato só existem a partir dessa versão; MariaDB e MySQL 5.7 não servem.
 
