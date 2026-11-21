@@ -22,6 +22,9 @@ export const config = {
 
 if (!config.appSecret || config.appSecret === 'troque-isto') {
   // Sem segredo próprio, qualquer pessoa que leia o código consegue forjar um token.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Defina APP_SECRET com um valor próprio para rodar em produção.');
+  }
   // eslint-disable-next-line no-console
   console.warn('[config] APP_SECRET não definido ou com valor de exemplo. Defina um valor próprio no .env.');
   if (!config.appSecret) config.appSecret = 'segredo-de-desenvolvimento';
